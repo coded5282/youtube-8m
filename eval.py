@@ -28,7 +28,7 @@ from tensorflow import logging
 import utils
 
 FLAGS = flags.FLAGS
-
+#
 if __name__ == "__main__":
   # Dataset flags.
   flags.DEFINE_string("train_dir", "/tmp/yt8m_model/",
