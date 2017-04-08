@@ -28,9 +28,9 @@ flags.DEFINE_integer(
     "The number of mixtures (excluding the dummy 'expert') used for MoeModel.")
 
 class LogisticModel(models.BaseModel):
-  """Logistic model with L2 regularization."""
+  """Logistic model with L1 regularization."""
 
-  def create_model(self, model_input, vocab_size, l1_penalty=1e-8, **unused_params):
+  def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
     """Creates a logistic model.
 
     Args:
