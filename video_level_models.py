@@ -30,7 +30,7 @@ flags.DEFINE_integer(
 class LogisticModel(models.BaseModel):
   """Logistic model with L2 regularization."""
 
-  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+  def create_model(self, model_input, vocab_size, l1_penalty=1e-8, **unused_params):
     """Creates a logistic model.
 
     Args:
@@ -43,7 +43,7 @@ class LogisticModel(models.BaseModel):
       batch_size x num_classes."""
     output = slim.fully_connected(
         model_input, vocab_size, activation_fn=tf.nn.sigmoid,
-        weights_regularizer=slim.l2_regularizer(l2_penalty))
+        weights_regularizer=slim.l1_regularizer(l1_penalty))
     return {"predictions": output}
 
 class MoeModel(models.BaseModel):
