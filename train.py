@@ -391,7 +391,7 @@ class Trainer(object):
             perr = eval_util.calculate_precision_at_equal_recall_rate(
                 predictions_val, labels_val)
             gap = eval_util.calculate_gap(predictions_val, labels_val)
-
+            logging.info("TRAINING STEP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             logging.info(
                 "%s: training step " + str(global_step_val) + "| Hit@1: " +
                 ("%.2f" % hit_at_one) + " PERR: " + ("%.2f" % perr) + " GAP: " +
