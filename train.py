@@ -359,7 +359,7 @@ class Trainer(object):
     meta_filename = self.get_meta_filename(start_new_model, self.train_dir)
 
     with tf.Graph().as_default() as graph:
-
+      print graph
       if meta_filename:
         saver = self.recover_model(meta_filename)
 
