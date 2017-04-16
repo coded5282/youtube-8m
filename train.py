@@ -370,7 +370,7 @@ class Trainer(object):
         saver=saver)
 
     logging.info("%s: Starting managed session.", task_as_string(self.task))
-    print "HI AFTER LOGGED"
+    print sv
     with sv.managed_session(target, config=self.config) as sess:
       print "HI IN HERE"
       try:
