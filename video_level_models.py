@@ -30,7 +30,7 @@ flags.DEFINE_integer(
 n_hidden_1 = 5000
 n_hidden_2 = 5000
 
-with tf.Graph().as_default() as graph:
+with tf.reset_default_graph():
   weights = {
   'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
   'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
