@@ -26,10 +26,12 @@ _TOP_PREDICTIONS_IN_OUTPUT = 20
 
 class ModelExporter(object):
 
-  def __init__(self, frame_features, model, reader):
+  def __init__(self, frame_features, model, reader, weights, biases):
     self.frame_features = frame_features
     self.model = model
     self.reader = reader
+    self.weights = weights
+    self.biases = biases
 
     with tf.Graph().as_default() as graph:
       self.inputs, self.outputs = self.build_inputs_and_outputs()
@@ -87,27 +89,13 @@ class ModelExporter(object):
 
     return inputs, outputs
 
-  def build_prediction_graph(self, serialized_examples):    
+  def build_prediction_graph(self, serialized_examples):
 
     video_id, model_input_raw, labels_batch, num_frames = (
         self.reader.prepare_serialized_examples(serialized_examples))
 
     feature_dim = len(model_input_raw.get_shape()) - 1
     model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
-
-    n_hidden_1 = 5000
-    n_hidden_2 = 5000
-
-    weights = {
-    'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
-    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
-    }
-    biases = {
-    'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-    'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([4716]))
-    }
 
     with tf.name_scope("model"):
       result = self.model.create_model(
@@ -116,8 +104,8 @@ class ModelExporter(object):
           vocab_size=self.reader.num_classes,
           labels=labels_batch,
           is_training=False,
-          weights=weights,
-          biases=biases)
+          weights=self.weights,
+          biases=self.biases)
 
       for variable in slim.get_model_variables():
         tf.summary.histogram(variable.op.name, variable)
