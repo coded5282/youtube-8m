@@ -101,3 +101,16 @@ class MoeModel(models.BaseModel):
     final_probabilities = tf.reshape(final_probabilities_by_class_and_batch,
                                      [-1, vocab_size])
     return {"predictions": final_probabilities}
+
+class NeuralModel(models.BaseModel):
+    # a neural network model
+  def create_model(self, model_input, vocab_size, weights, biases, l2_penalty=1e-8, **unused_params):
+    # Hidden layer with RELU activation
+    layer_1 = tf.add(tf.matmul(model_input, weights['h1']), biases['b1'])
+    layer_1 = tf.nn.relu(layer_1)
+    # Hidden layer with RELU activation
+    layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
+    layer_2 = tf.nn.relu(layer_2)
+    # Output layer with linear activation
+    out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+    return {"predictions": out_layer}
