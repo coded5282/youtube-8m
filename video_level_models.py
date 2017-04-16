@@ -30,7 +30,7 @@ flags.DEFINE_integer(
 n_hidden_1 = 5000
 n_hidden_2 = 5000
 
-with tf.reset_default_graph():
+with tf.name_scope("model"):
   weights = {
   'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
   'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
