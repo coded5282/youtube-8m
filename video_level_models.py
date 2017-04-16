@@ -27,6 +27,20 @@ flags.DEFINE_integer(
     "moe_num_mixtures", 2,
     "The number of mixtures (excluding the dummy 'expert') used for MoeModel.")
 
+n_hidden_1 = 5000
+n_hidden_2 = 5000
+
+weights = {
+'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
+'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
+}
+biases = {
+'b1': tf.Variable(tf.random_normal([n_hidden_1])),
+'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+'out': tf.Variable(tf.random_normal([4716]))
+}
+
 class LogisticModel(models.BaseModel):
   """Logistic model with L1 regularization."""
 
@@ -107,19 +121,6 @@ class NeuralModel(models.BaseModel):
   def create_model(self, model_input, vocab_size, **unused_params):
     print model_input.get_shape()[1]
     print vocab_size
-    n_hidden_1 = 5000
-    n_hidden_2 = 5000
-
-    weights = {
-    'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
-    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([n_hidden_2, vocab_size]))
-    }
-    biases = {
-    'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-    'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([vocab_size]))
-    }
 
     # Hidden layer with RELU activation
     layer_1 = tf.add(tf.matmul(model_input, weights['h1']), biases['b1'])
