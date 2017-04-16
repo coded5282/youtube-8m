@@ -106,6 +106,7 @@ class NeuralModel(models.BaseModel):
     # a neural network model
   def create_model(self, model_input, vocab_size, **unused_params):
     print model_input.get_shape()[1]
+    print vocab_size
     n_hidden_1 = 5000
     n_hidden_2 = 5000
 
