@@ -241,29 +241,12 @@ def build_graph(reader,
   model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
   print "MODEL INPUT: " + model_input
 
-  n_hidden_1 = 5000
-  n_hidden_2 = 5000
-
-  weights = {
-    'h1': tf.Variable(tf.random_normal([len(model_input), n_hidden_1])),
-    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([n_hidden_2, reader.num_classes]))
-  }
-  biases = {
-    'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-    'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([reader.num_classes]))
-  }
-
   with tf.name_scope("model"):
     result = model.create_model(
         model_input=model_input,
         num_frames=num_frames,
         vocab_size=reader.num_classes,
-        weights=weights,
-        biases=biases,
-        labels=labels_batch,
-        )
+        labels=labels_batch)
 
     for variable in slim.get_model_variables():
       tf.summary.histogram(variable.op.name, variable)
