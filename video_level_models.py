@@ -105,12 +105,12 @@ class MoeModel(models.BaseModel):
 class NeuralModel(models.BaseModel):
     # a neural network model
   def create_model(self, model_input, vocab_size, **unused_params):
-    print model_input
+    print model_input.getShape()
     n_hidden_1 = 5000
     n_hidden_2 = 5000
 
     weights = {
-    'h1': tf.Variable(tf.random_normal([len(model_input), n_hidden_1])),
+    'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
     'out': tf.Variable(tf.random_normal([n_hidden_2, vocab_size]))
     }
