@@ -105,7 +105,7 @@ class MoeModel(models.BaseModel):
 class NeuralModel(models.BaseModel):
     # a neural network model
   def create_model(self, model_input, vocab_size, **unused_params):
-    print "MODEL INPUT: " + model_input
+    print model_input
     n_hidden_1 = 5000
     n_hidden_2 = 5000
 
