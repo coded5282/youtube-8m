@@ -95,13 +95,29 @@ class ModelExporter(object):
     feature_dim = len(model_input_raw.get_shape()) - 1
     model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
 
+    n_hidden_1 = 5000
+    n_hidden_2 = 5000
+
+    weights = {
+    'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
+    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+    'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
+    }
+    biases = {
+    'b1': tf.Variable(tf.random_normal([n_hidden_1])),
+    'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+    'out': tf.Variable(tf.random_normal([4716]))
+    }
+
     with tf.name_scope("model"):
       result = self.model.create_model(
           model_input,
           num_frames=num_frames,
           vocab_size=self.reader.num_classes,
           labels=labels_batch,
-          is_training=False)
+          is_training=False,
+          weights=weights,
+          biases=biases)
 
       for variable in slim.get_model_variables():
         tf.summary.histogram(variable.op.name, variable)
