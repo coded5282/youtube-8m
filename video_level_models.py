@@ -104,7 +104,7 @@ class MoeModel(models.BaseModel):
 
 class NeuralModel(models.BaseModel):
     # a neural network model
-  def create_model(self, model_input, vocab_size, weights, biases, l2_penalty=1e-8, **unused_params):
+  def create_model(self, model_input, weights, biases, **unused_params):
     # Hidden layer with RELU activation
     layer_1 = tf.add(tf.matmul(model_input, weights['h1']), biases['b1'])
     layer_1 = tf.nn.relu(layer_1)
