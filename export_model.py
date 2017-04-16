@@ -34,6 +34,7 @@ class ModelExporter(object):
     self.biases = biases
 
     with tf.Graph().as_default() as graph:
+      print graph
       self.inputs, self.outputs = self.build_inputs_and_outputs()
       self.graph = graph
       self.saver = tf.train.Saver(tf.trainable_variables(), sharded=True)
