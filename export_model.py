@@ -26,7 +26,7 @@ _TOP_PREDICTIONS_IN_OUTPUT = 20
 
 class ModelExporter(object):
 
-  def __init__(self, frame_features, model, reader, weights, biases):
+  def __init__(self, frame_features, model, reader):
     self.frame_features = frame_features
     self.model = model
     self.reader = reader
