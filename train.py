@@ -100,20 +100,6 @@ if __name__ == "__main__":
       "Whether to write the device on which every op will run into the "
       "logs on startup.")
 
-n_hidden_1 = 5000
-n_hidden_2 = 5000
-
-weights = {
-'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
-'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
-}
-biases = {
-'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-'out': tf.Variable(tf.random_normal([4716]))
-}
-
 def validate_class_name(flag_value, category, modules, expected_superclass):
   """Checks that the given string matches a class of the expected type.
 
@@ -253,6 +239,20 @@ def build_graph(reader,
   feature_dim = len(model_input_raw.get_shape()) - 1
 
   model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
+
+  n_hidden_1 = 5000
+  n_hidden_2 = 5000
+
+  weights = {
+  'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
+  'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+  'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
+  }
+  biases = {
+  'b1': tf.Variable(tf.random_normal([n_hidden_1])),
+  'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+  'out': tf.Variable(tf.random_normal([4716]))
+  }
 
   with tf.name_scope("model"):
     result = model.create_model(
