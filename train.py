@@ -633,13 +633,13 @@ def main(unused_argv):
         [frame_level_models, video_level_models])()
     
     reader = get_reader()
-    
+
+
     model_exporter = export_model.ModelExporter(
         frame_features=FLAGS.frame_features,
         model=model,
-        reader=reader,
-        biases=biases,
-        weights=weights)
+        reader=reader)
+
 
     Trainer(cluster, task, FLAGS.train_dir, model, reader, model_exporter, 
             FLAGS.log_device_placement, FLAGS.max_steps, 
