@@ -272,6 +272,7 @@ def build_graph(reader,
     else:
       label_loss = label_loss_fn.calculate_loss(predictions, labels_batch)
     tf.summary.scalar("label_loss", label_loss)
+    print("LABEL LOSS!!!!!!!!!!!!!!!!!!!!!!" + str(label_loss))
 
     if "regularization_loss" in result.keys():
       reg_loss = result["regularization_loss"]
@@ -642,7 +643,7 @@ def main(unused_argv):
 
 
     Trainer(cluster, task, FLAGS.train_dir, model, reader, model_exporter, 
-            FLAGS.log_device_placement, FLAGS.max_steps, 
+            FLAGS.log_device_placement, FLAGS.max_steps,
             FLAGS.export_model_steps).run(start_new_model=FLAGS.start_new_model)
 
   elif task.type == "ps":
