@@ -272,7 +272,6 @@ def build_graph(reader,
     else:
       label_loss = label_loss_fn.calculate_loss(predictions, labels_batch)
     tf.summary.scalar("label_loss", label_loss)
-    print("LABEL LOSS!!!!!!!!!!!!!!!!!!!!!!" + str(label_loss))
 
     if "regularization_loss" in result.keys():
       reg_loss = result["regularization_loss"]
