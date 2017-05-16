@@ -116,4 +116,6 @@ class NeuralModel(models.BaseModel):
     layer_2 = tf.nn.relu(layer_2)
     # Output layer with linear activation
     out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+    print "OUT LAYER"
+    print out_layer
     return {"predictions": out_layer}
