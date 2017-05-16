@@ -182,7 +182,7 @@ def find_class_by_name(name, modules):
 def build_graph(reader,
                 model,
                 train_data_pattern,
-                label_loss_fn=losses.CrossEntropyLoss(),
+                label_loss_fn=losses.SoftmaxLoss(),
                 batch_size=1000,
                 base_learning_rate=0.01,
                 learning_rate_decay_examples=1000000,
@@ -396,7 +396,7 @@ class Trainer(object):
 
           batch_start_time = time.time()
           _, global_step_val, loss_val, predictions_val, labels_val = sess.run(
-              [train_op, global_step, loss, predictions, labels])
+              [train_op, global_step, loss, predictions, labels]) ################################# need feed dict ??????
           seconds_per_batch = time.time() - batch_start_time
 
           if self.max_steps and self.max_steps <= global_step_val:
