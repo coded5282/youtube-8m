@@ -239,7 +239,7 @@ def build_graph(reader,
   feature_dim = len(model_input_raw.get_shape()) - 1
 
   model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
-
+#####################################################################################################
   n_hidden_1 = 5000
   n_hidden_2 = 5000
 
@@ -253,7 +253,7 @@ def build_graph(reader,
   'b2': tf.Variable(tf.random_normal([n_hidden_2])),
   'out': tf.Variable(tf.random_normal([4716]))
   }
-
+#######################################################################################################
   with tf.name_scope("model"):
     result = model.create_model(
         model_input=model_input,
