@@ -182,7 +182,7 @@ def find_class_by_name(name, modules):
 def build_graph(reader,
                 model,
                 train_data_pattern,
-                label_loss_fn=losses.SoftmaxLoss(),
+                label_loss_fn=losses.HingeLoss(),
                 batch_size=1000,
                 base_learning_rate=0.01,
                 learning_rate_decay_examples=1000000,
