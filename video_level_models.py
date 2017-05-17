@@ -42,8 +42,9 @@ class LogisticModel(models.BaseModel):
       A dictionary with a tensor containing the probability predictions of the
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
+    first_layer = slim.fully_connected(model_input, 5000, activation_fn=tf.nn.sigmoid, weights_regularizer=slim.l1_regularizer(l1_penalty))
     output = slim.fully_connected(
-        model_input, vocab_size, activation_fn=tf.nn.sigmoid,
+        first_layer, vocab_size, activation_fn=tf.nn.sigmoid,
         weights_regularizer=slim.l1_regularizer(l1_penalty))
     return {"predictions": output}
 
