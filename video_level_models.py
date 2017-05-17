@@ -42,11 +42,16 @@ class LogisticModel(models.BaseModel):
       A dictionary with a tensor containing the probability predictions of the
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
-    first_layer = slim.fully_connected(model_input, 5000, activation_fn=tf.nn.sigmoid, weights_regularizer=slim.l1_regularizer(l1_penalty))
     output = slim.fully_connected(
-        first_layer, vocab_size, activation_fn=tf.nn.sigmoid,
+        model_input, vocab_size, activation_fn=tf.nn.sigmoid,
         weights_regularizer=slim.l1_regularizer(l1_penalty))
     return {"predictions": output}
+
+class PerceptronModel(models.BaseModel):
+    def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+        first_layer = slim.fully_connected(model_input, 5000, activation_fn=tf.nn.sigmoid, weights_regularizer=slim.l1_regularizer(l1_penalty))
+        output = slim.fully_connected(first_layer, vocab_size, activation_fn=tf.nn.sigmoid, weights_regularizer=slim.l1_regularizer(l1_penalty))
+        return {"predictions": output}
 
 class MoeModel(models.BaseModel):
   """A softmax over a mixture of logistic models (with L2 regularization)."""
