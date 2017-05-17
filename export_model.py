@@ -116,9 +116,7 @@ class ModelExporter(object):
           num_frames=num_frames,
           vocab_size=self.reader.num_classes,
           labels=labels_batch,
-          is_training=False,
-          weights=self.weights,
-          biases=self.biases)
+          is_training=False)
 
       for variable in slim.get_model_variables():
         tf.summary.histogram(variable.op.name, variable)
