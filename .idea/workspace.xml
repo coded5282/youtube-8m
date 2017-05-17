@@ -26,8 +26,8 @@
       <file leaf-file-name="video_level_models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/video_level_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.44864866">
-              <caret line="45" column="19" selection-start-line="45" selection-start-column="19" selection-end-line="45" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.4945946">
+              <caret line="51" column="139" selection-start-line="51" selection-start-column="139" selection-end-line="51" selection-end-column="139" />
               <folding>
                 <element signature="e#632#643#0" expanded="true" />
               </folding>
@@ -786,8 +786,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/video_level_models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.44864866">
-          <caret line="45" column="19" selection-start-line="45" selection-start-column="19" selection-end-line="45" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.4945946">
+          <caret line="51" column="139" selection-start-line="51" selection-start-column="139" selection-end-line="51" selection-end-column="139" />
           <folding>
             <element signature="e#632#643#0" expanded="true" />
           </folding>
