@@ -32,20 +32,20 @@ class ModelExporter(object):
     self.reader = reader
 ######################################################################
     with tf.Graph().as_default() as graph:
-      print graph
-      n_hidden_1 = 5000
-      n_hidden_2 = 5000
-
-      self.weights = {
-      'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
-      'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-      'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
-      }
-      self.biases = {
-      'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-      'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-      'out': tf.Variable(tf.random_normal([4716]))
-      }
+      # print graph
+      # n_hidden_1 = 5000
+      # n_hidden_2 = 5000
+      #
+      # self.weights = {
+      # 'h1': tf.Variable(tf.random_normal([1024, n_hidden_1])),
+      # 'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+      # 'out': tf.Variable(tf.random_normal([n_hidden_2, 4716]))
+      # }
+      # self.biases = {
+      # 'b1': tf.Variable(tf.random_normal([n_hidden_1])),
+      # 'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+      # 'out': tf.Variable(tf.random_normal([4716]))
+      # }
 ########################################################################
       self.inputs, self.outputs = self.build_inputs_and_outputs()
       self.graph = graph
