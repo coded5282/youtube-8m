@@ -45,6 +45,7 @@ class LogisticModel(models.BaseModel):
     output = slim.fully_connected(
         model_input, vocab_size, activation_fn=tf.nn.sigmoid,
         weights_regularizer=slim.l1_regularizer(l1_penalty))
+    output = tf.Print(output, [tf.argmax(output, 1)], 'out = ', summarize = 20, first_n = 10)
     return {"predictions": output}
 
 class PerceptronModel(models.BaseModel):
