@@ -110,19 +110,19 @@ class MoeModel(models.BaseModel):
                                      [-1, vocab_size])
     return {"predictions": final_probabilities}
 
-class NeuralModel(models.BaseModel):
-    # a neural network model
-  def create_model(self, model_input, vocab_size, weights, biases, **unused_params):
-    print model_input.get_shape()[1]
-    print vocab_size
-    # Hidden layer with RELU activation
-    layer_1 = tf.add(tf.matmul(model_input, weights['h1']), biases['b1'])
-    layer_1 = tf.nn.relu(layer_1)
-    # Hidden layer with RELU activation
-    layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
-    layer_2 = tf.nn.relu(layer_2)
-    # Output layer with linear activation
-    out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
-    print "OUT LAYER"
-    print out_layer
-    return {"predictions": out_layer}
+# class NeuralModel(models.BaseModel):
+#     # a neural network model
+#   def create_model(self, model_input, vocab_size, weights, biases, **unused_params):
+#     print model_input.get_shape()[1]
+#     print vocab_size
+#     # Hidden layer with RELU activation
+#     layer_1 = tf.add(tf.matmul(model_input, weights['h1']), biases['b1'])
+#     layer_1 = tf.nn.relu(layer_1)
+#     # Hidden layer with RELU activation
+#     layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
+#     layer_2 = tf.nn.relu(layer_2)
+#     # Output layer with linear activation
+#     out_layer = tf.matmul(layer_2, weights['out']) + biases['out']
+#     print "OUT LAYER"
+#     print out_layer
+#     return {"predictions": out_layer}
