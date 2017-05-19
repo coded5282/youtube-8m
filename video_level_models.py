@@ -51,7 +51,7 @@ class PerceptronModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
         input_layer = slim.fully_connected(model_input, 5000, activation_fn=tf.nn.relu)
         hidden_layer = slim.fully_connected(input_layer, 5000, activation_fn=tf.nn.relu)
-        output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.relu, weights_regularizer=slim.l1_regularizer(l1_penalty))
+        output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.relu)
         output = tf.Print(output, [tf.argmax(output, 1)], 'out = ', summarize = 20, first_n = 10)
         return {"predictions": output}
 
