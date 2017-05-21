@@ -50,6 +50,7 @@ class LogisticModel(models.BaseModel):
 
 class PerceptronModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+        print model_input.get_shape()[1]
         input_layer = slim.fully_connected(model_input, 5000, activation_fn=tf.nn.relu)
         hidden_layer = slim.fully_connected(input_layer, 5000, activation_fn=tf.nn.relu)
         output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
