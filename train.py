@@ -64,7 +64,7 @@ if __name__ == "__main__":
       " new model instance.")
 
   # Training flags.
-  flags.DEFINE_integer("batch_size", 1024,
+  flags.DEFINE_integer("batch_size", 500, # was 1024
                        "How many examples to process per batch for training.")
   flags.DEFINE_string("label_loss", "CrossEntropyLoss",
                       "Which loss function to use for training the model.")
@@ -183,7 +183,7 @@ def build_graph(reader,
                 model,
                 train_data_pattern,
                 label_loss_fn=losses.CrossEntropyLoss(),
-                batch_size=500,
+                batch_size=1000,
                 base_learning_rate=0.001,
                 learning_rate_decay_examples=1000000,
                 learning_rate_decay=0.95,
