@@ -53,8 +53,12 @@ class PerceptronModel(models.BaseModel):
         # input_layer = slim.fully_connected(model_input, 3000, activation_fn=tf.nn.relu) ## currently training
         # hidden_layer = slim.fully_connected(input_layer, 3000, activation_fn=tf.nn.relu)
         # output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
-        input_layer = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.relu)
-        hidden_layer = slim.fully_connected(input_layer, 2000, activation_fn=tf.nn.relu)
+
+        # input_layer = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.relu)
+        # hidden_layer = slim.fully_connected(input_layer, 2000, activation_fn=tf.nn.relu)
+        # output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
+
+        hidden_layer = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.relu)
         output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
         output = tf.Print(output, [tf.argmax(output, 1)], 'out = ', summarize = 60, first_n = 100)
         return {"predictions": output}
