@@ -61,7 +61,7 @@ class PerceptronModel(models.BaseModel):
         # hidden_layer = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.relu) # training (yt8m_train_video_one_layer_2000)
         # output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
 
-        hidden_layer = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.sigmoid) #
+        hidden_layer = slim.fully_connected(model_input, 8000, activation_fn=tf.nn.sigmoid) #
         output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
         output = tf.Print(output, [tf.argmax(output, 1)], 'out = ', summarize = 60, first_n = 100)
         return {"predictions": output}
