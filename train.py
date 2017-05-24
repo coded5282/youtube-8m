@@ -242,6 +242,7 @@ def build_graph(reader,
 
   print("MODEL INPUT SHAPE:")
   print(model_input.get_shape())
+  logging.info("MODEL INPUT SHAPE IS: " + str(model_input.get_shape()))
 #####################################################################################################
   # n_hidden_1 = 5000
   # n_hidden_2 = 5000
