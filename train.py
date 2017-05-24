@@ -239,6 +239,9 @@ def build_graph(reader,
   feature_dim = len(model_input_raw.get_shape()) - 1
 
   model_input = tf.nn.l2_normalize(model_input_raw, feature_dim)
+
+  print("MODEL INPUT SHAPE:")
+  print(model_input.get_shape())
 #####################################################################################################
   # n_hidden_1 = 5000
   # n_hidden_2 = 5000
