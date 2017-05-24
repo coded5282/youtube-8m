@@ -66,13 +66,20 @@ class PerceptronModel(models.BaseModel):
         output = tf.Print(output, [tf.argmax(output, 1)], 'out = ', summarize = 60, first_n = 100)
         return {"predictions": output}
 
+class ConvModel(models.BaseModel):
+    def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+        pass
+
 class vgg16(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+        model_input = tf.Print(model_input, [model_input], message = 'model input: ')
+        # print model input using tf.print
+        input_layer = tf.reshape(model_input, [-1, 1, 1024, 1])
         with slim.arg_scope([slim.conv2d, slim.fully_connected],
                       activation_fn=tf.nn.relu,
                       weights_initializer=tf.truncated_normal_initializer(0.0, 0.01),
                       weights_regularizer=slim.l2_regularizer(0.0005)):
-            net = slim.repeat(model_input, 2, slim.conv2d, 64, [3, 3], scope='conv1')
+            net = slim.repeat(input_layer, 2, slim.conv2d, 64, [3, 3], scope='conv1')
             net = slim.max_pool2d(net, [2, 2], scope='pool1')
             net = slim.repeat(net, 2, slim.conv2d, 128, [3, 3], scope='conv2')
             net = slim.max_pool2d(net, [2, 2], scope='pool2')
