@@ -244,7 +244,7 @@ def build_graph(reader,
   print(model_input.get_shape())
   logging.info("MODEL INPUT SHAPE IS: " + str(model_input.get_shape()))
   logging.info("SHAPE: " + str(tf.shape(model_input)))
-  logging.info("SHAPE INFO: " + str(model_input.get_shape.as_list()))
+  logging.info("SHAPE INFO: " + str(model_input.get_shape().as_list()))
 #####################################################################################################
   # n_hidden_1 = 5000
   # n_hidden_2 = 5000
