@@ -50,6 +50,7 @@ class LogisticModel(models.BaseModel):
 
 class PerceptronModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+        model_input = tf.Print(model_input, [model_input], message = 'model input: ')
         # input_layer = slim.fully_connected(model_input, 3000, activation_fn=tf.nn.relu) ## .65
         # hidden_layer = slim.fully_connected(input_layer, 3000, activation_fn=tf.nn.relu)
         # output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
@@ -61,8 +62,9 @@ class PerceptronModel(models.BaseModel):
         # hidden_layer = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.relu) # training (yt8m_train_video_one_layer_2000)
         # output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
 
-        hidden_layer = slim.fully_connected(model_input, 8000, activation_fn=tf.nn.relu) #
-        output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
+        hidden_layer_1 = slim.fully_connected(model_input, 2000, activation_fn=tf.nn.relu) #
+        hidden_layer_2 = slim.fully_connected(hidden_layer_1, 4000, activation_fn=tf.nn.relu)
+        output = slim.fully_connected(hidden_layer_2, vocab_size, activation_fn=tf.nn.softmax)
         output = tf.Print(output, [tf.argmax(output, 1)], 'out = ', summarize = 60, first_n = 100)
         return {"predictions": output}
 
