@@ -81,27 +81,27 @@ class vgg16(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
         model_input = tf.Print(model_input, [model_input], message = 'model input: ')
         # print model input using tf.print
-        input_layer = tf.reshape(model_input, [-1, 1, 1024, 1])
+        input_layer = tf.reshape(model_input, [-1, 1024, 1])
         with slim.arg_scope([slim.conv2d, slim.fully_connected],
                       activation_fn=tf.nn.relu,
                       weights_initializer=tf.truncated_normal_initializer(0.0, 0.01),
                       weights_regularizer=slim.l2_regularizer(0.0005)):
-            net = slim.repeat(input_layer, 2, slim.conv2d, 64, [3, 3], scope='conv1')
-            net = slim.max_pool2d(net, [2, 2], scope='pool1')
-            net = slim.repeat(net, 2, slim.conv2d, 128, [3, 3], scope='conv2')
-            net = slim.max_pool2d(net, [2, 2], scope='pool2')
-            net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
-            net = slim.max_pool2d(net, [2, 2], scope='pool3')
-            net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv4')
-            net = slim.max_pool2d(net, [2, 2], scope='pool4')
-            net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv5')
-            net = slim.max_pool2d(net, [2, 2], scope='pool5')
+            net = slim.repeat(input_layer, 2, slim.conv2d, 64, [3], scope='conv1')
+            net = slim.pool(net, [2], "MAX", scope='pool1')
+            net = slim.repeat(net, 2, slim.conv2d, 128, [3], scope='conv2')
+            net = slim.pool(net, [2], "MAX", scope='pool2')
+            net = slim.repeat(net, 3, slim.conv2d, 256, [3], scope='conv3')
+            net = slim.pool(net, [2], "MAX", scope='pool3')
+            net = slim.repeat(net, 3, slim.conv2d, 512, [3], scope='conv4')
+            net = slim.pool(net, [2], "MAX", scope='pool4')
+            net = slim.repeat(net, 3, slim.conv2d, 512, [3], scope='conv5')
+            net = slim.pool(net, [2], "MAX", scope='pool5')
             net = slim.fully_connected(net, 4096, scope='fc6')
             net = slim.dropout(net, 0.5, scope='dropout6')
             net = slim.fully_connected(net, 4096, scope='fc7')
             net = slim.dropout(net, 0.5, scope='dropout7')
             net = slim.fully_connected(net, vocab_size, activation_fn=None, scope='fc8')
-        return net
+        return {"predictions": net}
 
 class MoeModel(models.BaseModel):
   """A softmax over a mixture of logistic models (with L2 regularization)."""
