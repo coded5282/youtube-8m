@@ -74,8 +74,8 @@ class ConvModel(models.BaseModel):
         cnn_input = tf.reshape(model_input, [-1, 1024, 1])
         net = slim.conv2d(cnn_input, 128, [3])
         net = slim.pool(net, [2], "MAX")
+        net = slim.flatten(net)
         output = slim.fully_connected(net, vocab_size, activation_fn=tf.nn.softmax)
-        output = tf.reshape(output, [-1, vocab_size])
         return {"predictions": output}
 
 class vgg16(models.BaseModel):
