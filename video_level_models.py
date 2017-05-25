@@ -72,7 +72,7 @@ class PerceptronModel(models.BaseModel):
 class ConvModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
         cnn_input = tf.reshape(model_input, [-1, 1152, 1])
-        net = slim.conv2d(cnn_input, 128, [3, 3])
+        net = slim.conv2d(cnn_input, 128, [3])
         net = slim.max_pool2d(net, [2, 2])
         output = slim.fully_connected(net, vocab_size, activation_fn=tf.nn.softmax)
         return {"predictions": output}
