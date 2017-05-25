@@ -71,7 +71,11 @@ class PerceptronModel(models.BaseModel):
 
 class ConvModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
-        pass
+        
+        net = slim.conv2d(model_input, 128, [3, 3])
+        net = slim.max_pool2d(net, [2, 2])
+        output = slim.fully_connected(net, vocab_size, activation_fn=tf.nn.softmax)
+        return {"predictions": output}
 
 class vgg16(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
