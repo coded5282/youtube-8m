@@ -76,10 +76,18 @@ class PerceptronModel(models.BaseModel):
 
 class ConvModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
-        cnn_input = tf.reshape(model_input, [-1, 1024, 1])
+        # cnn_input = tf.reshape(model_input, [-1, 1024, 1])
+        # net = slim.conv2d(cnn_input, 32, [1])
+        # net = slim.pool(net, [1], "MAX")
+        # net = slim.flatten(net)
+        # output = slim.fully_connected(net, vocab_size, activation_fn=tf.nn.softmax)
+
+        cnn_input = tf.reshape(model_input, [-1, 1152, 1])
         net = slim.conv2d(cnn_input, 32, [1])
         net = slim.pool(net, [1], "MAX")
         net = slim.flatten(net)
+        net = slim.fully_connected(net, 6000, activation_fn=tf.nn.relu)
+        net = slim.dropout(net, 0.5)
         output = slim.fully_connected(net, vocab_size, activation_fn=tf.nn.softmax)
         return {"predictions": output}
 
@@ -87,7 +95,7 @@ class vgg16(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
         model_input = tf.Print(model_input, [model_input], message = 'model input: ')
         # print model input using tf.print
-        input_layer = tf.reshape(model_input, [-1, 1024, 1])
+        input_layer = tf.reshape(model_input, [-1, 1152, 1])
         with slim.arg_scope([slim.conv2d, slim.fully_connected],
                       activation_fn=tf.nn.relu,
                       weights_initializer=tf.truncated_normal_initializer(0.0, 0.01),
