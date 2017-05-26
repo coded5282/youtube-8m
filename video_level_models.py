@@ -64,9 +64,9 @@ class PerceptronModel(models.BaseModel):
         # output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
 
         input_layer = slim.fully_connected(model_input, 6000, activation_fn=tf.nn.relu) #
-        drop_layer_1 = slim.dropout(input_layer, 0.5)
+        drop_layer_1 = slim.dropout(input_layer, 1.0)
         hidden_layer_1 = slim.fully_connected(drop_layer_1, 6000, activation_fn=tf.nn.relu)
-        drop_layer_2 = slim.dropout(hidden_layer_1, 0.5)
+        drop_layer_2 = slim.dropout(hidden_layer_1, 1.0)
         skip_layer = tf.add(input_layer, drop_layer_2)
         activate_layer = tf.nn.relu(skip_layer)
         output = slim.fully_connected(activate_layer, vocab_size, activation_fn=tf.nn.softmax)
