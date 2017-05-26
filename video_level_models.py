@@ -107,7 +107,7 @@ class vgg16(models.BaseModel):
             net = slim.dropout(net, 0.5, scope='dropout6')
             net = slim.fully_connected(net, 4096, scope='fc7')
             net = slim.dropout(net, 0.5, scope='dropout7')
-            net = slim.fully_connected(net, vocab_size, activation_fn=None, scope='fc8')
+            net = slim.fully_connected(net, vocab_size, activation_fn=tf.nn.softmax, scope='fc8')
         return {"predictions": net}
 
 class MoeModel(models.BaseModel):
