@@ -97,6 +97,7 @@ class vgg16(models.BaseModel):
             net = slim.pool(net, [2], "MAX", scope='pool4')
             net = slim.repeat(net, 3, slim.conv2d, 512, [3], scope='conv5')
             net = slim.pool(net, [2], "MAX", scope='pool5')
+            net = slim.flatten(net)
             net = slim.fully_connected(net, 4096, scope='fc6')
             net = slim.dropout(net, 0.5, scope='dropout6')
             net = slim.fully_connected(net, 4096, scope='fc7')
