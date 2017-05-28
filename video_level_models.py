@@ -25,7 +25,7 @@ import tensorflow.contrib.slim as slim
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer(
-    "moe_num_mixtures", 10,
+    "moe_num_mixtures", 6,
     "The number of mixtures (excluding the dummy 'expert') used for MoeModel.")
 
 class LogisticModel(models.BaseModel):
