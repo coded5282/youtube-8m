@@ -88,7 +88,7 @@ class ResModel(models.BaseModel):
         drop_layer_1 = slim.dropout(input_layer, 0.5)
         hidden_layer = slim.fully_connected(drop_layer_1, 6000, activation_fn=tf.nn.relu)
         drop_layer_2 = slim.dropout(hidden_layer, 0.5)
-        skip_layer = tf.add(model_input, drop_layer_2)
+        skip_layer = tf.add(input_layer, drop_layer_2)
         output = slim.fully_connected(skip_layer, vocab_size, activation_fn=tf.nn.softmax)
         return {"predictions": output}
         pass
