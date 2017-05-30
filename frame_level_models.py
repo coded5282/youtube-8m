@@ -46,6 +46,8 @@ flags.DEFINE_string("video_level_classifier_model", "MoeModel",
                     "classifier layer")
 flags.DEFINE_integer("lstm_cells", 1024, "Number of LSTM cells.")
 flags.DEFINE_integer("lstm_layers", 2, "Number of LSTM layers.")
+flags.DEFINE_bool("lstm_bidirectional", False, "LSTM layers are bidirectional.")
+flags.DEFINE_bool("lstm_dropout", False, "LSTM layers use dropout.")
 
 class FrameLevelLogisticModel(models.BaseModel):
 
@@ -234,3 +236,88 @@ class LstmModel(models.BaseModel):
         model_input=state,
         vocab_size=vocab_size,
         **unused_params)
+################################################################################################
+class LSTMModel(models.BaseModel):
+
+  def create_model(self,
+                   model_input,
+                   vocab_size,
+                   num_frames,
+                   is_training=True,
+                   **unused_params):
+    """Creates a model which uses a stack of LSTMs to represent the video.
+    Args:
+      model_input: A 'batch_size' x 'max_frames' x 'num_features' matrix of
+                   input features.
+      vocab_size: The number of classes in the dataset.
+      num_frames: A vector of length 'batch' which indicates the number of
+           frames for each video (before padding).
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      'batch_size' x 'num_classes'.
+    """
+    lstm_size = FLAGS.lstm_cells
+    number_of_layers = FLAGS.lstm_layers
+    bidirectional = FLAGS.lstm_bidirectional
+    dropout = FLAGS.lstm_dropout
+
+    if dropout and is_training:
+        stacked_lstm = tf.contrib.rnn.MultiRNNCell(
+                [
+                    tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.BasicLSTMCell(
+                        lstm_size, forget_bias=1.0),
+                        input_keep_prob=0.5,
+                        output_keep_prob=0.5)
+                    for _ in range(number_of_layers)
+                    ])
+    else:
+        stacked_lstm = tf.contrib.rnn.MultiRNNCell(
+                [
+                    tf.contrib.rnn.BasicLSTMCell(
+                        lstm_size, forget_bias=1.0)
+                    for _ in range(number_of_layers)
+                    ])
+
+    if bidirectional:
+        if dropout and is_training:
+            stacked_lstm_bw = tf.contrib.rnn.MultiRNNCell(
+                    [
+                        tf.contrib.rnn.DropoutWrapper(tf.contrib.rnn.BasicLSTMCell(
+                            lstm_size, forget_bias=1.0),
+                            input_keep_prob=0.5,
+                            output_keep_prob=0.5)
+                        for _ in range(number_of_layers)
+                        ])
+        else:
+            stacked_lstm_bw = tf.contrib.rnn.MultiRNNCell(
+                    [
+                        tf.contrib.rnn.BasicLSTMCell(
+                            lstm_size, forget_bias=1.0)
+                        for _ in range(number_of_layers)
+                        ])
+
+    loss = 0.0
+
+    if bidirectional:
+        _, (state_f, state_b) = tf.nn.bidirectional_dynamic_rnn(
+                                           stacked_lstm,
+                                           stacked_lstm_bw,
+                                           model_input,
+                                           sequence_length=num_frames,
+                                           dtype=tf.float32)
+        state_h = tf.concat([state_f[-1].h, state_b[-1].h], axis=1)
+    else:
+        _, state = tf.nn.dynamic_rnn(stacked_lstm, model_input,
+                                           sequence_length=num_frames,
+                                           dtype=tf.float32)
+        state_h = state[-1].h
+
+    aggregated_model = getattr(video_level_models,
+                               FLAGS.video_level_classifier_model)
+
+    return aggregated_model().create_model(
+        model_input=state_h,
+        vocab_size=vocab_size,
+        **unused_params)
+#################################################################################################

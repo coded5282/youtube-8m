@@ -93,3 +93,74 @@ def FramePooling(frames, method, **unused_params):
     return tf.reshape(frames, [-1, feature_size])
   else:
     raise ValueError("Unrecognized pooling method: %s" % method)
+
+def make_fully_connected_net(input_, sizes, vocab_size,
+  l2_penalty, batch_norm=False):
+  layers = []
+  normalizer = slim.batch_norm if batch_norm else None
+  for size in sizes:
+      prev = layers[-1] if len(layers) else input_
+      layers.append(
+          slim.fully_connected(
+              prev,
+              size,
+              weights_regularizer=slim.l2_regularizer(l2_penalty),
+              normalizer_fn=normalizer
+          )
+      )
+  return slim.fully_connected(
+      layers[-1] if len(layers) else input_,
+      vocab_size,
+      activation_fn=tf.nn.sigmoid,
+      weights_regularizer=slim.l2_regularizer(l2_penalty)
+  )
+
+def make_fcnet_with_skips(input_, sizes, skip_conns, vocab_size, l2_penalty):
+  """
+  Adds skip connections between layers based on the parameter `skip_conns`,
+  which should be a list of pairs. A connection will be added from the
+  output of the source layer to the output of the target layer. The outputs
+  will be summed before passing to the next layer. The input will be index 0
+  and the layers start from 1.
+  If there is a mismatch between the output size of the source and target
+  layers, a linear projection layer will be added. Batch normalization is
+  also enabled for the layers.
+  """
+  skips = {}
+  for (s, e) in skip_conns:
+      assert s < e, "Connections should be feedforward"
+      if e in skips:
+          skips[e].add(s)
+      else:
+          skips[e] = set([s])
+  input_size = input_.get_shape().as_list()[1]
+  layers = []
+
+  for i, size in enumerate(sizes):
+      prev = layers[-1] if len(layers) else input_
+      layers.append(
+          slim.fully_connected(
+              prev,
+              size,
+              weights_regularizer=slim.l2_regularizer(l2_penalty),
+              normalizer_fn=slim.batch_norm
+          )
+      )
+
+      # Check if there is an incoming connection
+      if (i+1) in skips and len(skips[i+1]):
+          for source in skips[i+1]:
+              source_layer = input_ if source == 0 else layers[source-1]
+              source_size = input_size if source == 0 else sizes[source-1]
+              if source_size == size:
+                  layers[-1] = tf.add(layers[-1], source_layer)
+              else:
+                  projection = slim.fully_connected(source_layer, size,
+                      activation_fn=None) # linear layer
+                  layers[-1] = tf.add(layers[-1], projection)
+  return slim.fully_connected(
+      layers[-1] if len(layers) else input_,
+      vocab_size,
+      activation_fn=tf.nn.sigmoid,
+      weights_regularizer=slim.l2_regularizer(l2_penalty)
+  )

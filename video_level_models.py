@@ -19,6 +19,7 @@ import models
 import tensorflow as tf
 import utils
 #import tflearn
+import model_utils
 
 from tensorflow import flags
 import tensorflow.contrib.slim as slim
@@ -83,15 +84,29 @@ class PerceptronModel(models.BaseModel):
         return {"predictions": output}
 
 class ResModel(models.BaseModel):
-    def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+    def create_model(self, model_input, vocab_size, is_training, l1_penalty=1e-10, **unused_params):
+
+        if is_training == True:
+            drop_prob = 0.5
+        else:
+            drop_prob = 1
+
         input_layer = slim.fully_connected(model_input, 10000, activation_fn=tf.nn.relu)
-        drop_layer_1 = slim.dropout(input_layer, 1.0)
+        drop_layer_1 = slim.dropout(input_layer, drop_prob)
         hidden_layer = slim.fully_connected(drop_layer_1, 10000, activation_fn=tf.nn.relu)
-        drop_layer_2 = slim.dropout(hidden_layer, 1.0)
+        drop_layer_2 = slim.dropout(hidden_layer, drop_prob)
         skip_layer = tf.add(input_layer, drop_layer_2)
         output = slim.fully_connected(skip_layer, vocab_size, activation_fn=tf.nn.softmax)
         return {"predictions": output}
         pass
+
+class AutoModel(models.BaseModel):
+    def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
+        input_layer = slim.fully_connected(model_input, 1152, activation_fn=tf.nn.relu)
+        hidden_layer = slim.fully_connected(input_layer, 300, activation_fn=tf.nn.relu)
+        output = slim.fully_connected(hidden_layer, vocab_size, activation_fn=tf.nn.softmax)
+        return {"predictions": output}
+
 
 class ConvModel(models.BaseModel):
     def create_model(self, model_input, vocab_size, l1_penalty=1e-10, **unused_params):
@@ -209,3 +224,394 @@ class MoeModel(models.BaseModel):
 #     print "OUT LAYER"
 #     print out_layer
 #     return {"predictions": out_layer}
+##################################################################################################################################
+class ComplexMoeModel(models.BaseModel):
+  """A softmax over a mixture of logistic models (with L2 regularization)."""
+
+  def create_model(self,
+                   model_input,
+                   vocab_size,
+                   num_mixtures=None,
+                   l2_penalty=1e-8,
+                   **unused_params):
+    """Creates a Mixture of (Logistic) Experts model.
+     The model consists of a per-class softmax distribution over a
+     configurable number of logistic classifiers. One of the classifiers in the
+     mixture is not trained, and always predicts 0.
+    Args:
+      model_input: 'batch_size' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+      num_mixtures: The number of mixtures (excluding a dummy 'expert' that
+        always predicts the non-existence of an entity).
+      l2_penalty: How much to penalize the squared magnitudes of parameter
+        values.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes.
+    """
+    num_mixtures = num_mixtures or FLAGS.moe_num_mixtures
+
+    gate_activations = slim.fully_connected(
+        model_input,
+        vocab_size * (num_mixtures + 1),
+        activation_fn=None,
+        biases_initializer=None,
+        weights_regularizer=slim.l2_regularizer(l2_penalty),
+        scope="gates")
+    expert_mid_activations = slim.fully_connected(
+        model_input,
+        2048,
+        weights_regularizer=slim.l2_regularizer(l2_penalty),
+        scope="expertsMid")
+    expert_activations = slim.fully_connected(
+        expert_mid_activations,
+        vocab_size * num_mixtures,
+        activation_fn=None,
+        weights_regularizer=slim.l2_regularizer(l2_penalty),
+        scope="experts")
+
+    gating_distribution = tf.nn.softmax(tf.reshape(
+        gate_activations,
+        [-1, num_mixtures + 1]))  # (Batch * #Labels) x (num_mixtures + 1)
+    expert_distribution = tf.nn.sigmoid(tf.reshape(
+        expert_activations,
+        [-1, num_mixtures]))  # (Batch * #Labels) x num_mixtures
+
+    final_probabilities_by_class_and_batch = tf.reduce_sum(
+        gating_distribution[:, :num_mixtures] * expert_distribution, 1)
+    final_probabilities = tf.reshape(final_probabilities_by_class_and_batch,
+                                     [-1, vocab_size])
+    return {"predictions": final_probabilities}
+#############################################################################################################################
+class MLPModelV2(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fully_connected_net(model_input,
+          [784, 512, 256], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class MLPModel384(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fully_connected_net(model_input,
+          [784, 512, 384], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class DeepMLPModel(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fully_connected_net(model_input,
+          [784, 512, 512, 512, 256], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class BatchNormMLP(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fully_connected_net(model_input,
+          [784, 512, 512, 512, 256], vocab_size, l2_penalty, batch_norm=True)
+      return {"predictions": output}
+
+class SkipConnections(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+          [784, 512, 512, 512, 256], [(0, 3), (2, 4)], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class DeepSkip(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+          [784] + [512]*8,
+          [(0, 3), (2, 4), (4, 6), (6, 8)], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class BigNN(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+          [1024] + [768]*8,
+          [(0, 3), (2, 4), (4, 6), (6, 8)], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class BiggerNN(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+          [1536] + [1024]*8,
+          [(0, 3), (2, 4), (4, 6), (6, 8)], vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class DeeperSkip(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+          [784] + [512]*14,
+          [(0, 3), (2, 4), (4, 6), (6, 8), (8, 10), (10, 12), (12, 14)],
+          vocab_size, l2_penalty)
+      return {"predictions": output}
+#######################################################################################################
+class Model3nn2048BnReluSkipDouble(models.BaseModel):
+  def create_model(self, model_input, vocab_size, num_hidden_units=2048, l2_penalty=1e-8, prefix='', **unused_params):
+      """Creates a logistic model.
+      Args:
+        model_input: 'batch' x 'num_features' matrix of input features.
+        vocab_size: The number of classes in the dataset.
+      Returns:
+        A dictionary with a tensor containing the probability predictions of the
+        model in the 'predictions' key. The dimensions of the tensor are
+        batch_size x num_classes."""
+      # Initialize weights for projection
+      w_s = tf.Variable(tf.random_normal(shape=[1152, 2048], stddev=0.01))
+      input_projected = tf.matmul(model_input, w_s)
+
+      hidden1 = tf.layers.dense(
+          inputs=model_input, units=num_hidden_units, activation=None,
+          kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix + 'fc_1')
+
+      bn1 = slim.batch_norm(hidden1, scope=prefix + 'bn1')
+
+      relu1 = tf.nn.relu(bn1, name=prefix + 'relu1')
+
+      input_projected_plus_h1 = tf.add(input_projected, relu1)
+
+      hidden2 = tf.layers.dense(
+          inputs=input_projected_plus_h1, units=num_hidden_units, activation=None,
+          kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix + 'fc_2')
+
+      bn2 = slim.batch_norm(hidden2, scope=prefix + 'bn2')
+
+      relu2 = tf.nn.relu(bn2, name=prefix + 'relu2')
+
+      input_projected_plus_h2 = tf.add_n([input_projected, input_projected_plus_h1, relu2])
+      # input_projected_plus_h2 = tf.add(input_plus_h1, relu2)
+
+      output = slim.fully_connected(
+          input_projected_plus_h2, vocab_size, activation_fn=tf.nn.sigmoid,
+          weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix + 'fc_3')
+
+      weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+      return {"predictions": output, "regularization_loss": weights_norm}
+      # return {"predictions": output}
+##############################################################################################################################
+class TwoLayerModel(models.BaseModel):
+  def create_model(self, model_input, vocab_size, num_hidden_units=2048, l2_penalty=1e-8, prefix='', **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+    hidden1 = slim.fully_connected(
+        model_input, num_hidden_units, activation_fn=tf.nn.relu,
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_1')
+
+    hidden1 = slim.dropout(hidden1, 0.5, scope=prefix+"dropout1")
+
+    output = slim.fully_connected(
+        hidden1, vocab_size, activation_fn=tf.nn.sigmoid,
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_2')
+
+    weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+    return {"predictions": output, "regularization_loss": weights_norm,"hidden_features": hidden1}
+    #return {"predictions": output}
+
+class NeuralAverageModel(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+    """Creates an Average prediction of NN models.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    output_2048a = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048a/')
+    output_2048b = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048b/')
+    output_2048c = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048c/')
+    output_2048d = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048d/')
+
+    t1 = output_2048a["predictions"]
+    t2 = output_2048b["predictions"]
+    t3 = output_2048c["predictions"]
+    t4 = output_2048d["predictions"]
+
+    output_sum = tf.add_n([t1, t2, t3, t4])
+
+    scalar = tf.constant(0.25)
+    output = tf.scalar_mul(scalar, output_sum)
+
+    return {"predictions": output}
+
+class StackModel(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+    """Creates a Stack of Neural Networks Model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    output_2048a = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048a/')
+    output_2048b = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048b/')
+    output_2048c = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048c/')
+    output_2048d = TwoLayerModel().create_model(model_input, vocab_size,\
+                               num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048d/')
+
+    t1 = output_2048a["hidden_features"]
+    t2 = output_2048a["hidden_features"]
+    t3 = output_2048a["hidden_features"]
+    t4 = output_2048a["hidden_features"]
+
+    stacked_features = tf.concat([t1, t2, t3, t4], 1)
+    stacked_fc1 = slim.fully_connected(
+      stacked_features,
+      2048,
+      activation_fn=tf.nn.relu,
+      weights_regularizer=slim.l2_regularizer(l2_penalty),
+      scope="Stack/fc1")
+    stacked_fc1 = slim.dropout(stacked_fc1, 0.5, scope="Stack/dropout1")
+    stacked_fc2 = slim.fully_connected(
+      stacked_fc1,
+      vocab_size,
+      activation_fn=None,
+      weights_regularizer=slim.l2_regularizer(l2_penalty),
+      scope="Stack/fc2")
+
+    output = tf.nn.sigmoid(stacked_fc2)
+
+    #return {"predictions": output, "regularization_loss": weights_norm}
+    return {"predictions": output}
+##############################################################################################################################
+class FCModel(models.BaseModel):
+  """Logistic model with L2 regularization."""
+
+  def create_model(self, model_input, vocab_size, nb_units=2000, **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+    output = slim.fully_connected(model_input, nb_units, scope="fc1")
+    output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2")
+    return {"predictions": output}
+
+class FC2Model(models.BaseModel):
+  """Logistic model with L2 regularization."""
+
+  def create_model(self, model_input, vocab_size, nb_units=1000, l2_penalty=1e-8, **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+    output = slim.fully_connected(model_input, nb_units, scope="fc1",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    # output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
+        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    return {"predictions": output}
+
+class FC3Model(models.BaseModel):
+  """Logistic model with L2 regularization."""
+
+  def create_model(self, model_input, vocab_size, nb_units=2000, l2_penalty=1e-8, **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+    output = slim.fully_connected(model_input, nb_units, scope="fc1",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    # output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
+        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    return {"predictions": output}
+
+class FC4Model(models.BaseModel):
+  """Logistic model with L2 regularization."""
+
+  def create_model(self, model_input, vocab_size, nb_units=2000, l2_penalty=1e-8, **unused_params):
+    output = slim.fully_connected(model_input, nb_units, scope="fc1",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    output = slim.fully_connected(output, nb_units, scope="fc2",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    # output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc3",
+        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    return {"predictions": output}
+
+class FC5Model(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, nb_units=2000, l2_penalty=1e-8, **unused_params):
+    output = slim.fully_connected(model_input, nb_units, scope="fc1",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    output = slim.dropout(output, 0.8, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
+        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    return {"predictions": output}
+
+class FC6Model(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, nb_units=2000, l2_penalty=1e-7, **unused_params):
+    output = slim.fully_connected(model_input, nb_units, scope="fc1",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    # output = slim.dropout(output, 0.1, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
+        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    return {"predictions": output}
+
+class FC7Model(models.BaseModel):
+  def create_model(self, model_input, vocab_size, nb_units=3000, l2_penalty=1e-8, **unused_params):
+    output = slim.fully_connected(model_input, nb_units, scope="fc1",
+                                  weights_regularizer=slim.l2_regularizer(l2_penalty))
+    # output = slim.dropout(output, 0.1, scope="dropout1")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
+        weights_regularizer=slim.l2_regularizer(l2_penalty))
+    return {"predictions": output}
+
+class FCBNModel(models.BaseModel):
+  """Logistic model with L2 regularization."""
+
+  def create_model(self, model_input, vocab_size, nb_units=2000, **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+    output = slim.fully_connected(model_input, nb_units, scope="fc1")
+    output = slim.batch_norm(output, scope="bn1")
+    output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.fully_connected(output, nb_units, scope="fc2")
+    output = slim.batch_norm(output, scope="bn2")
+    output = slim.dropout(output, 0.5, scope="dropout2")
+    output = slim.fully_connected(
+        output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc3")
+    return {"predictions": output}
+##########################################################################################################
