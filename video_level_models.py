@@ -535,7 +535,7 @@ class FC2Model(models.BaseModel):
       batch_size x num_classes."""
     output = slim.fully_connected(model_input, nb_units, scope="fc1",
                                   weights_regularizer=slim.l2_regularizer(l2_penalty))
-    # output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.dropout(output, 0.5, scope="dropout1")
     output = slim.fully_connected(
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
         weights_regularizer=slim.l2_regularizer(l2_penalty))
@@ -555,7 +555,7 @@ class FC3Model(models.BaseModel):
       batch_size x num_classes."""
     output = slim.fully_connected(model_input, nb_units, scope="fc1",
                                   weights_regularizer=slim.l2_regularizer(l2_penalty))
-    # output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.dropout(output, 0.5, scope="dropout1")
     output = slim.fully_connected(
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
         weights_regularizer=slim.l2_regularizer(l2_penalty))
@@ -569,7 +569,7 @@ class FC4Model(models.BaseModel):
                                   weights_regularizer=slim.l2_regularizer(l2_penalty))
     output = slim.fully_connected(output, nb_units, scope="fc2",
                                   weights_regularizer=slim.l2_regularizer(l2_penalty))
-    # output = slim.dropout(output, 0.5, scope="dropout1")
+    output = slim.dropout(output, 0.5, scope="dropout1")
     output = slim.fully_connected(
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc3",
         weights_regularizer=slim.l2_regularizer(l2_penalty))
@@ -591,7 +591,7 @@ class FC6Model(models.BaseModel):
   def create_model(self, model_input, vocab_size, nb_units=2000, l2_penalty=1e-7, **unused_params):
     output = slim.fully_connected(model_input, nb_units, scope="fc1",
                                   weights_regularizer=slim.l2_regularizer(l2_penalty))
-    # output = slim.dropout(output, 0.1, scope="dropout1")
+    output = slim.dropout(output, 0.1, scope="dropout1")
     output = slim.fully_connected(
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
         weights_regularizer=slim.l2_regularizer(l2_penalty))
@@ -601,7 +601,7 @@ class FC7Model(models.BaseModel):
   def create_model(self, model_input, vocab_size, nb_units=3000, l2_penalty=1e-8, **unused_params):
     output = slim.fully_connected(model_input, nb_units, scope="fc1",
                                   weights_regularizer=slim.l2_regularizer(l2_penalty))
-    # output = slim.dropout(output, 0.1, scope="dropout1")
+    output = slim.dropout(output, 0.1, scope="dropout1")
     output = slim.fully_connected(
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc2",
         weights_regularizer=slim.l2_regularizer(l2_penalty))
