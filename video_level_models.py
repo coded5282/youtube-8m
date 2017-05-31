@@ -284,6 +284,20 @@ class ComplexMoeModel(models.BaseModel):
                                      [-1, vocab_size])
     return {"predictions": final_probabilities}
 #############################################################################################################################
+class MLPModel(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+    """Creates a MLP model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+    output = model_utils.make_fully_connected_net(model_input,
+        [512, 256], vocab_size, l2_penalty)
+    return {"predictions": output}
+
 class MLPModelV2(models.BaseModel):
   def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
       output = model_utils.make_fully_connected_net(model_input,
