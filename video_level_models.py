@@ -479,9 +479,9 @@ class StackModel(models.BaseModel):
                                num_hidden_units=2048, l2_penalty=l2_penalty, prefix='u2048d/')
 
     t1 = output_2048a["hidden_features"]
-    t2 = output_2048a["hidden_features"]
-    t3 = output_2048a["hidden_features"]
-    t4 = output_2048a["hidden_features"]
+    t2 = output_2048b["hidden_features"]
+    t3 = output_2048c["hidden_features"]
+    t4 = output_2048d["hidden_features"]
 
     stacked_features = tf.concat([t1, t2, t3, t4], 1)
     stacked_fc1 = slim.fully_connected(
