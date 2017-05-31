@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="36053fd2-4756-43fa-81dd-c34d5128ceb6" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frame_level_models.py" afterPath="$PROJECT_DIR$/frame_level_models.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_utils.py" afterPath="$PROJECT_DIR$/model_utils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train.py" afterPath="$PROJECT_DIR$/train.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/video_level_models.py" afterPath="$PROJECT_DIR$/video_level_models.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -30,8 +27,8 @@
       <file leaf-file-name="video_level_models.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/video_level_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.15">
-              <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.45945945">
+              <caret line="245" column="74" selection-start-line="245" selection-start-column="74" selection-end-line="245" selection-end-column="74" />
               <folding>
                 <element signature="e#632#643#0" expanded="true" />
               </folding>
@@ -52,7 +49,7 @@
       <file leaf-file-name="inference.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/inference.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-3.4827585">
+            <state vertical-scroll-proportion="0.0">
               <caret line="131" column="32" selection-start-line="131" selection-start-column="32" selection-end-line="131" selection-end-column="32" />
               <folding>
                 <element signature="e#661#670#0" expanded="true" />
@@ -64,7 +61,7 @@
       <file leaf-file-name="eval.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/eval.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.172414">
+            <state vertical-scroll-proportion="0.0">
               <caret line="310" column="51" selection-start-line="310" selection-start-column="46" selection-end-line="310" selection-end-column="51" />
               <folding>
                 <element signature="e#671#682#0" expanded="true" />
@@ -88,7 +85,7 @@
       <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.172414">
+            <state vertical-scroll-proportion="0.0">
               <caret line="617" column="6" selection-start-line="617" selection-start-column="4" selection-end-line="617" selection-end-column="6" />
               <folding>
                 <element signature="e#669#680#0" expanded="true" />
@@ -139,8 +136,8 @@
         <option value="$PROJECT_DIR$/losses.py" />
         <option value="$PROJECT_DIR$/train.py" />
         <option value="$PROJECT_DIR$/model_utils.py" />
-        <option value="$PROJECT_DIR$/video_level_models.py" />
         <option value="$PROJECT_DIR$/frame_level_models.py" />
+        <option value="$PROJECT_DIR$/video_level_models.py" />
       </list>
     </option>
   </component>
@@ -419,9 +416,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="70" column="59" selection-start-line="70" selection-start-column="59" selection-end-line="70" selection-end-column="59" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -463,9 +457,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="70" column="59" selection-start-line="70" selection-start-column="59" selection-end-line="70" selection-end-column="59" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -507,9 +498,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -565,9 +553,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -602,9 +587,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="55" column="42" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -639,9 +621,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="55" column="42" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -676,9 +655,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="55" column="42" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -706,9 +682,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="55" column="42" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -736,9 +709,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="55" column="42" selection-start-line="55" selection-start-column="42" selection-end-line="55" selection-end-column="42" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -768,9 +738,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5175676">
           <caret line="113" column="39" selection-start-line="113" selection-start-column="39" selection-end-line="113" selection-end-column="39" />
-          <folding>
-            <element signature="e#654#677#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -786,7 +753,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.172414">
+        <state vertical-scroll-proportion="0.0">
           <caret line="617" column="6" selection-start-line="617" selection-start-column="4" selection-end-line="617" selection-end-column="6" />
           <folding>
             <element signature="e#669#680#0" expanded="true" />
@@ -796,7 +763,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/eval.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.172414">
+        <state vertical-scroll-proportion="0.0">
           <caret line="310" column="51" selection-start-line="310" selection-start-column="46" selection-end-line="310" selection-end-column="51" />
           <folding>
             <element signature="e#671#682#0" expanded="true" />
@@ -806,7 +773,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/inference.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-3.4827585">
+        <state vertical-scroll-proportion="0.0">
           <caret line="131" column="32" selection-start-line="131" selection-start-column="32" selection-end-line="131" selection-end-column="32" />
           <folding>
             <element signature="e#661#670#0" expanded="true" />
@@ -834,8 +801,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/video_level_models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15">
-          <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.45945945">
+          <caret line="245" column="74" selection-start-line="245" selection-start-column="74" selection-end-line="245" selection-end-column="74" />
           <folding>
             <element signature="e#632#643#0" expanded="true" />
           </folding>
