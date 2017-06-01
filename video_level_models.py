@@ -26,7 +26,7 @@ import tensorflow.contrib.slim as slim
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer(
-    "moe_num_mixtures", 2,
+    "moe_num_mixtures", 7,
     "The number of mixtures (excluding the dummy 'expert') used for MoeModel.")
 
 class LogisticModel(models.BaseModel):
@@ -645,7 +645,7 @@ class FCBNModel(models.BaseModel):
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc3")
     return {"predictions": output}
 ##########################################################################################################
-class Model3nn4096BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
+class MLPA(models.BaseModel): # Model3nn4096BnReluDropSkipDoubleLr1e7decay9
 
   def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-7, prefix='', **unused_params):
     """Creates a logistic model.
@@ -708,7 +708,7 @@ class Model3nn4096BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
 
 
 
-class Model4nn2048BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
+class MLPB(models.BaseModel): # Model4nn2048BnReluDropSkipDoubleLr1e7decay9
 
   def create_model(self, model_input, vocab_size, num_hidden_units=2048, l2_penalty=1e-7, prefix='', **unused_params):
     """Creates a logistic model.
@@ -789,7 +789,7 @@ class Model4nn2048BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
     #return {"predictions": output}
 
 
-class Model4nn4096BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
+class MLPC(models.BaseModel): # Model4nn4096BnReluDropSkipDoubleLr1e7decay9
 
   def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-7, prefix='', **unused_params):
     """Creates a logistic model.
@@ -874,7 +874,7 @@ class Model4nn4096BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
 
 
 
-class Model4nn4096BnReluDropSkipDoubleLr5e7decay9(models.BaseModel):
+class MLPD(models.BaseModel): # Model4nn4096BnReluDropSkipDoubleLr5e7decay9
 
   def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=5e-7, prefix='', **unused_params):
     """Creates a logistic model.
@@ -955,7 +955,7 @@ class Model4nn4096BnReluDropSkipDoubleLr5e7decay9(models.BaseModel):
     #return {"predictions": output}
 
 
-class Model4nn4096BnReluDropSkipDoubleLr1e6decay9(models.BaseModel):
+class MLPE(models.BaseModel): # Model4nn4096BnReluDropSkipDoubleLr1e6decay9
 
   def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-6, prefix='', **unused_params):
     """Creates a logistic model.
@@ -1034,3 +1034,31 @@ class Model4nn4096BnReluDropSkipDoubleLr1e6decay9(models.BaseModel):
 
     return {"predictions": output, "regularization_loss": weights_norm}
     #return {"predictions": output}
+##########################################################################################################################
+class EnsembleModel(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+    """Creates an Average prediction of NN models.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    output_a = LogisticModel().create_model(model_input, vocab_size)
+    output_b = MLPModel().create_model(model_input, vocab_size)
+    output_c = MoeModel().create_model(model_input, vocab_size, num_mixtures=7)
+    output_d = DeepSkip().create_model(model_input, vocab_size)
+
+    t1 = output_a["predictions"]
+    t2 = output_b["predictions"]
+    t3 = output_c["predictions"]
+    t4 = output_d["predictions"]
+
+    output_sum = tf.add_n([t1, t2, t3, t4])
+
+    scalar = tf.constant(0.25)
+    output = tf.scalar_mul(scalar, output_sum)
+
+    return {"predictions": output}
