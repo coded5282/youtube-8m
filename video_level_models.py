@@ -356,6 +356,22 @@ class DeeperSkip(models.BaseModel):
           [(0, 3), (2, 4), (4, 6), (6, 8), (8, 10), (10, 12), (12, 14)],
           vocab_size, l2_penalty)
       return {"predictions": output}
+
+class MidSkip(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+            [1536, 1024],
+            [(0, 2)],
+            vocab_size, l2_penalty)
+      return {"predictions": output}
+
+class SmallSkip(models.BaseModel):
+  def create_model(self, model_input, vocab_size, l2_penalty=1e-8, **unused_params):
+      output = model_utils.make_fcnet_with_skips(model_input,
+            [1536],
+            [(0, 2)],
+            vocab_size, l2_penalty)
+      return {"predictions": output}
 #######################################################################################################
 class Model3nn2048BnReluSkipDouble(models.BaseModel):
   def create_model(self, model_input, vocab_size, num_hidden_units=2048, l2_penalty=1e-8, prefix='', **unused_params):
@@ -629,3 +645,392 @@ class FCBNModel(models.BaseModel):
         output, vocab_size, activation_fn=tf.nn.sigmoid, scope="fc3")
     return {"predictions": output}
 ##########################################################################################################
+class Model3nn4096BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-7, prefix='', **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    # Initialize weights for projection
+    w_s = tf.Variable(tf.random_normal(shape=[1152, 4096], stddev=0.01))
+    input_projected = tf.matmul(model_input, w_s)
+
+    hidden1 = tf.layers.dense(
+        inputs=model_input, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_1')
+
+
+    bn1 = tf.contrib.layers.batch_norm(inputs=hidden1, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn1')
+
+    relu1 = tf.nn.relu(hidden1, name=prefix+'relu1' )
+
+    dropout1 = tf.layers.dropout(inputs=relu1, rate=0.5, name=prefix+"dropout1")
+
+
+    hidden2 = tf.layers.dense(
+        inputs=dropout1, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_2')
+
+    bn2 = tf.contrib.layers.batch_norm(inputs=hidden2, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn2')
+
+
+    relu2 = tf.nn.relu(hidden2, name=prefix+'relu2' )
+
+    dropout2 = tf.layers.dropout(inputs=relu2, rate=0.5, name=prefix+"dropout2")
+
+    input_projected_plus_h2 = tf.add(input_projected, dropout2)
+
+    output = slim.fully_connected(
+        input_projected_plus_h2, vocab_size, activation_fn=tf.nn.sigmoid,
+        weights_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        biases_initializer=tf.zeros_initializer(),
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_3')
+
+
+    weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+    return {"predictions": output, "regularization_loss": weights_norm}
+    #return {"predictions": output}
+
+
+
+class Model4nn2048BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, num_hidden_units=2048, l2_penalty=1e-7, prefix='', **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    # Initialize weights for projection
+    w_s = tf.Variable(tf.random_normal(shape=[1152, 2048], stddev=0.01))
+    input_projected = tf.matmul(model_input, w_s)
+
+    hidden1 = tf.layers.dense(
+        inputs=model_input, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_1')
+
+
+    bn1 = tf.contrib.layers.batch_norm(inputs=hidden1, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn1')
+
+    relu1 = tf.nn.relu(hidden1, name=prefix+'relu1' )
+
+    dropout1 = tf.layers.dropout(inputs=relu1, rate=0.5, name=prefix+"dropout1")
+
+
+    hidden2 = tf.layers.dense(
+        inputs=dropout1, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_2')
+
+    bn2 = tf.contrib.layers.batch_norm(inputs=hidden2, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn2')
+
+
+    relu2 = tf.nn.relu(hidden2, name=prefix+'relu2' )
+
+    dropout2 = tf.layers.dropout(inputs=relu2, rate=0.5, name=prefix+"dropout2")
+
+    input_projected_plus_h2 = tf.add(input_projected, dropout2)
+
+
+    hidden3 = tf.layers.dense(
+        inputs=input_projected_plus_h2, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_3')
+
+    bn3 = tf.contrib.layers.batch_norm(inputs=hidden3, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn3')
+
+    relu3 = tf.nn.relu(hidden3, name=prefix+'relu3' )
+
+    dropout3 = tf.layers.dropout(inputs=relu3, rate=0.5, name=prefix+"dropout3")
+
+
+    input_projected_plus_h3 = tf.add(input_projected, dropout3)
+    #input_projected_plus_h2 = tf.add(input_plus_h1, relu2)
+
+    output = slim.fully_connected(
+        input_projected_plus_h3, vocab_size, activation_fn=tf.nn.sigmoid,
+        weights_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        biases_initializer=tf.zeros_initializer(),
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_4')
+
+
+    weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+    return {"predictions": output, "regularization_loss": weights_norm}
+    #return {"predictions": output}
+
+
+class Model4nn4096BnReluDropSkipDoubleLr1e7decay9(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-7, prefix='', **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    # Initialize weights for projection
+    w_s = tf.Variable(tf.random_normal(shape=[1152, 4096], stddev=0.01))
+    input_projected = tf.matmul(model_input, w_s)
+
+    hidden1 = tf.layers.dense(
+        inputs=model_input, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_1')
+
+
+    bn1 = tf.contrib.layers.batch_norm(inputs=hidden1, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn1')
+
+    relu1 = tf.nn.relu(hidden1, name=prefix+'relu1' )
+
+    dropout1 = tf.layers.dropout(inputs=relu1, rate=0.5, name=prefix+"dropout1")
+
+
+    hidden2 = tf.layers.dense(
+        inputs=dropout1, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_2')
+
+    bn2 = tf.contrib.layers.batch_norm(inputs=hidden2, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn2')
+
+
+    relu2 = tf.nn.relu(hidden2, name=prefix+'relu2' )
+
+    dropout2 = tf.layers.dropout(inputs=relu2, rate=0.5, name=prefix+"dropout2")
+
+    input_projected_plus_h2 = tf.add(input_projected, dropout2)
+
+
+    hidden3 = tf.layers.dense(
+        inputs=input_projected_plus_h2, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_3')
+
+    bn3 = tf.contrib.layers.batch_norm(inputs=hidden3, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn3')
+
+    relu3 = tf.nn.relu(hidden3, name=prefix+'relu3' )
+
+    dropout3 = tf.layers.dropout(inputs=relu3, rate=0.5, name=prefix+"dropout3")
+
+
+    input_projected_plus_h3 = tf.add(input_projected, dropout3)
+    #input_projected_plus_h2 = tf.add(input_plus_h1, relu2)
+
+    output = slim.fully_connected(
+        input_projected_plus_h3, vocab_size, activation_fn=tf.nn.sigmoid,
+        weights_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        biases_initializer=tf.zeros_initializer(),
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_4')
+
+
+    weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+    return {"predictions": output, "regularization_loss": weights_norm}
+    #return {"predictions": output}
+
+
+
+
+
+
+class Model4nn4096BnReluDropSkipDoubleLr5e7decay9(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=5e-7, prefix='', **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    # Initialize weights for projection
+    w_s = tf.Variable(tf.random_normal(shape=[1152, 4096], stddev=0.01))
+    input_projected = tf.matmul(model_input, w_s)
+
+    hidden1 = tf.layers.dense(
+        inputs=model_input, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_1')
+
+
+    bn1 = tf.contrib.layers.batch_norm(inputs=hidden1, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn1')
+
+    relu1 = tf.nn.relu(hidden1, name=prefix+'relu1' )
+
+    dropout1 = tf.layers.dropout(inputs=relu1, rate=0.5, name=prefix+"dropout1")
+
+
+    hidden2 = tf.layers.dense(
+        inputs=dropout1, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_2')
+
+    bn2 = tf.contrib.layers.batch_norm(inputs=hidden2, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn2')
+
+
+    relu2 = tf.nn.relu(hidden2, name=prefix+'relu2' )
+
+    dropout2 = tf.layers.dropout(inputs=relu2, rate=0.5, name=prefix+"dropout2")
+
+    input_projected_plus_h2 = tf.add(input_projected, dropout2)
+
+
+    hidden3 = tf.layers.dense(
+        inputs=input_projected_plus_h2, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_3')
+
+    bn3 = tf.contrib.layers.batch_norm(inputs=hidden3, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn3')
+
+    relu3 = tf.nn.relu(hidden3, name=prefix+'relu3' )
+
+    dropout3 = tf.layers.dropout(inputs=relu3, rate=0.5, name=prefix+"dropout3")
+
+
+    input_projected_plus_h3 = tf.add(input_projected, dropout3)
+    #input_projected_plus_h2 = tf.add(input_plus_h1, relu2)
+
+    output = slim.fully_connected(
+        input_projected_plus_h3, vocab_size, activation_fn=tf.nn.sigmoid,
+        weights_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        biases_initializer=tf.zeros_initializer(),
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_4')
+
+
+    weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+    return {"predictions": output, "regularization_loss": weights_norm}
+    #return {"predictions": output}
+
+
+class Model4nn4096BnReluDropSkipDoubleLr1e6decay9(models.BaseModel):
+
+  def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-6, prefix='', **unused_params):
+    """Creates a logistic model.
+    Args:
+      model_input: 'batch' x 'num_features' matrix of input features.
+      vocab_size: The number of classes in the dataset.
+    Returns:
+      A dictionary with a tensor containing the probability predictions of the
+      model in the 'predictions' key. The dimensions of the tensor are
+      batch_size x num_classes."""
+
+    # Initialize weights for projection
+    w_s = tf.Variable(tf.random_normal(shape=[1152, 4096], stddev=0.01))
+    input_projected = tf.matmul(model_input, w_s)
+
+    hidden1 = tf.layers.dense(
+        inputs=model_input, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_1')
+
+
+    bn1 = tf.contrib.layers.batch_norm(inputs=hidden1, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn1')
+
+    relu1 = tf.nn.relu(hidden1, name=prefix+'relu1' )
+
+    dropout1 = tf.layers.dropout(inputs=relu1, rate=0.5, name=prefix+"dropout1")
+
+
+    hidden2 = tf.layers.dense(
+        inputs=dropout1, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_2')
+
+    bn2 = tf.contrib.layers.batch_norm(inputs=hidden2, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn2')
+
+
+    relu2 = tf.nn.relu(hidden2, name=prefix+'relu2' )
+
+    dropout2 = tf.layers.dropout(inputs=relu2, rate=0.5, name=prefix+"dropout2")
+
+    input_projected_plus_h2 = tf.add(input_projected, dropout2)
+
+
+    hidden3 = tf.layers.dense(
+        inputs=input_projected_plus_h2, units=num_hidden_units, activation=None,
+        kernel_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        bias_initializer=tf.zeros_initializer(),
+        kernel_regularizer=slim.l2_regularizer(l2_penalty), name=prefix+'fc_3')
+
+    bn3 = tf.contrib.layers.batch_norm(inputs=hidden3, decay=0.9, center=True,
+                                scale=True, epsilon=1e-7, activation_fn=None,
+                                is_training=True, scope=prefix+'bn3')
+
+    relu3 = tf.nn.relu(hidden3, name=prefix+'relu3' )
+
+    dropout3 = tf.layers.dropout(inputs=relu3, rate=0.5, name=prefix+"dropout3")
+
+
+    input_projected_plus_h3 = tf.add(input_projected, dropout3)
+    #input_projected_plus_h2 = tf.add(input_plus_h1, relu2)
+
+    output = slim.fully_connected(
+        input_projected_plus_h3, vocab_size, activation_fn=tf.nn.sigmoid,
+        weights_initializer =tf.contrib.layers.xavier_initializer(uniform=True, seed=None, dtype=tf.float32),
+        biases_initializer=tf.zeros_initializer(),
+        weights_regularizer=slim.l2_regularizer(l2_penalty), scope=prefix+'fc_4')
+
+
+    weights_norm = tf.add_n(tf.losses.get_regularization_losses())
+
+    return {"predictions": output, "regularization_loss": weights_norm}
+    #return {"predictions": output}
