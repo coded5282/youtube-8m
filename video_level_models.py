@@ -160,6 +160,7 @@ class MoeModel(models.BaseModel):
                    vocab_size,
                    num_mixtures=None,
                    l2_penalty=1e-8,
+                   prefix='',
                    **unused_params):
     """Creates a Mixture of (Logistic) Experts model.
 
@@ -233,6 +234,7 @@ class ComplexMoeModel(models.BaseModel):
                    vocab_size,
                    num_mixtures=None,
                    l2_penalty=1e-8,
+                   prefix='',
                    **unused_params):
     """Creates a Mixture of (Logistic) Experts model.
      The model consists of a per-class softmax distribution over a
@@ -1134,10 +1136,10 @@ class MLPAverageA(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = MLPE().create_model(model_input, vocab_size)
-    output_b = MLPE().create_model(model_input, vocab_size)
-    output_c = MLPE().create_model(model_input, vocab_size)
-    output_d = MLPE().create_model(model_input, vocab_size)
+    output_a = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = MLPE().create_model(model_input, vocab_size, prefix='u2048b/')
+    output_c = MLPE().create_model(model_input, vocab_size, prefix='u2048c/')
+    output_d = MLPE().create_model(model_input, vocab_size, prefix='u2048d/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1162,9 +1164,9 @@ class MLPAverageB(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = MLPE().create_model(model_input, vocab_size)
-    output_b = MLPE().create_model(model_input, vocab_size)
-    output_c = MLPE().create_model(model_input, vocab_size)
+    output_a = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = MLPE().create_model(model_input, vocab_size, prefix='u2048b/')
+    output_c = MLPE().create_model(model_input, vocab_size, prefix='u2048c/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1188,8 +1190,8 @@ class MLPAverageC(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = MLPE().create_model(model_input, vocab_size)
-    output_b = MLPE().create_model(model_input, vocab_size)
+    output_a = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = MLPE().create_model(model_input, vocab_size, prefix='u2048b/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1370,10 +1372,10 @@ class ComplexMoeAverageA(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = ComplexMoeModel().create_model(model_input, vocab_size)
-    output_b = ComplexMoeModel().create_model(model_input, vocab_size)
-    output_c = ComplexMoeModel().create_model(model_input, vocab_size)
-    output_d = ComplexMoeModel().create_model(model_input, vocab_size)
+    output_a = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
+    output_c = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048c/')
+    output_d = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048d/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1398,9 +1400,9 @@ class ComplexMoeAverageB(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = ComplexMoeModel().create_model(model_input, vocab_size)
-    output_b = ComplexMoeModel().create_model(model_input, vocab_size)
-    output_c = ComplexMoeModel().create_model(model_input, vocab_size)
+    output_a = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
+    output_c = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048c/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1424,8 +1426,8 @@ class ComplexMoeAverageC(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = ComplexMoeModel().create_model(model_input, vocab_size)
-    output_b = ComplexMoeModel().create_model(model_input, vocab_size)
+    output_a = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1448,10 +1450,10 @@ class MoeAverageA(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = MoeModel().create_model(model_input, vocab_size)
-    output_b = MoeModel().create_model(model_input, vocab_size)
-    output_c = MoeModel().create_model(model_input, vocab_size)
-    output_d = MoeModel().create_model(model_input, vocab_size)
+    output_a = MoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = MoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
+    output_c = MoeModel().create_model(model_input, vocab_size, prefix='u2048c/')
+    output_d = MoeModel().create_model(model_input, vocab_size, prefix='u2048d/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
@@ -1476,9 +1478,9 @@ class MoeAverageB(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_a = MoeModel().create_model(model_input, vocab_size)
-    output_b = MoeModel().create_model(model_input, vocab_size)
-    output_c = MoeModel().create_model(model_input, vocab_size)
+    output_a = MoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
+    output_b = MoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
+    output_c = MoeModel().create_model(model_input, vocab_size, prefix='u2048c/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
