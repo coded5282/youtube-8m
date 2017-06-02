@@ -1288,7 +1288,7 @@ class MLPESoftmax(models.BaseModel): # Model4nn4096BnReluDropSkipDoubleLr1e6deca
 
 class MLPEUse(models.BaseModel): # Model4nn4096BnReluDropSkipDoubleLr1e6decay9
 
-  def create_model(self, model_input, vocab_size, num_hidden_units=4176, l2_penalty=1e-6, prefix='', **unused_params):
+  def create_model(self, model_input, vocab_size, num_hidden_units=4096, l2_penalty=1e-6, prefix='', **unused_params):
     """Creates a logistic model.
     Args:
       model_input: 'batch' x 'num_features' matrix of input features.
@@ -1299,7 +1299,7 @@ class MLPEUse(models.BaseModel): # Model4nn4096BnReluDropSkipDoubleLr1e6decay9
       batch_size x num_classes."""
 
     # Initialize weights for projection
-    w_s = tf.Variable(tf.random_normal(shape=[1152, 4176], stddev=0.01))
+    w_s = tf.Variable(tf.random_normal(shape=[4176, 4096], stddev=0.01))
     input_projected = tf.matmul(model_input, w_s)
 
     hidden1 = tf.layers.dense(
