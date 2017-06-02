@@ -1637,7 +1637,7 @@ class StackEnsembleB(models.BaseModel):
 
     output_2048a = LogisticModel().create_model(model_input, vocab_size)
     output_2048b = MoeModel().create_model(model_input, vocab_size)
-    output_2048c = MLPE().create_model(model_input, vocab_size)
+    output_2048c = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
     output_2048d = ComplexMoeModel().create_model(model_input, vocab_size)
 
     t1 = output_2048a["predictions"]
@@ -1649,7 +1649,7 @@ class StackEnsembleB(models.BaseModel):
     scalar = tf.constant(0.25)
     avg_output = tf.scalar_mul(scalar, output_sum)
 
-    output = MLPEUse().create_model(avg_output, vocab_size)
+    output = MLPEUse().create_model(avg_output, vocab_size, prefix='u2048b/')
 
     return {"predictions": output}
 
@@ -1666,7 +1666,7 @@ class StackEnsembleC(models.BaseModel):
 
     output_2048a = LogisticModel().create_model(model_input, vocab_size)
     output_2048b = MoeModel().create_model(model_input, vocab_size)
-    output_2048c = MLPE().create_model(model_input, vocab_size)
+    output_2048c = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
     output_2048d = BiggerNN().create_model(model_input, vocab_size)
 
     t1 = output_2048a["predictions"]
@@ -1678,6 +1678,6 @@ class StackEnsembleC(models.BaseModel):
     scalar = tf.constant(0.25)
     avg_output = tf.scalar_mul(scalar, output_sum)
 
-    output = MLPEUse().create_model(avg_output, vocab_size)
+    output = MLPEUse().create_model(avg_output, vocab_size, prefix='u2048b/')
 
     return {"predictions": output}
