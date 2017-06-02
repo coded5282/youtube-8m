@@ -1635,10 +1635,10 @@ class StackEnsembleB(models.BaseModel):
       model in the 'predictions' key. The dimensions of the tensor are
       batch_size x num_classes."""
 
-    output_2048a = LogisticModel().create_model(model_input, vocab_size)
-    output_2048b = MoeModel().create_model(model_input, vocab_size)
-    output_2048c = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
-    output_2048d = ComplexMoeModel().create_model(model_input, vocab_size)
+    output_2048a = LogisticModel().create_model(model_input, vocab_size, prefix='e2048a/')
+    output_2048b = MoeModel().create_model(model_input, vocab_size, prefix='e2048b/')
+    output_2048c = MLPE().create_model(model_input, vocab_size, prefix='e2048c/')
+    output_2048d = ComplexMoeModel().create_model(model_input, vocab_size, prefix='e2048d/')
 
     t1 = output_2048a["predictions"]
     t2 = output_2048b["predictions"]
@@ -1649,7 +1649,7 @@ class StackEnsembleB(models.BaseModel):
     scalar = tf.constant(0.25)
     avg_output = tf.scalar_mul(scalar, output_sum)
 
-    output = MLPEUse().create_model(avg_output, vocab_size, prefix='u2048b/')
+    output = MLPEUse().create_model(avg_output, vocab_size, prefix='e2048e/')
 
     return {"predictions": output}
 
