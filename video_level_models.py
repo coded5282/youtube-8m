@@ -1167,14 +1167,18 @@ class MLPAverageB(models.BaseModel):
     output_a = MLPE().create_model(model_input, vocab_size, prefix='u2048a/')
     output_b = MLPE().create_model(model_input, vocab_size, prefix='u2048b/')
     output_c = MLPE().create_model(model_input, vocab_size, prefix='u2048c/')
+    output_d = MLPE().create_model(model_input, vocab_size, prefix='u2048d/')
+    output_e = MLPE().create_model(model_input, vocab_size, prefix='u2048e/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
     t3 = output_c["predictions"]
+    t4 = output_d["predictions"]
+    t5 = output_e["predictions"]
 
-    output_sum = tf.add_n([t1, t2, t3])
+    output_sum = tf.add_n([t1, t2, t3, t4, t5])
 
-    scalar = tf.constant(1/3)
+    scalar = tf.constant(0.20)
     output = tf.scalar_mul(scalar, output_sum)
 
     return {"predictions": output}
@@ -1403,14 +1407,18 @@ class ComplexMoeAverageB(models.BaseModel):
     output_a = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
     output_b = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
     output_c = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048c/')
+    output_d = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048d/')
+    output_e = ComplexMoeModel().create_model(model_input, vocab_size, prefix='u2048e/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
     t3 = output_c["predictions"]
+    t4 = output_d["predictions"]
+    t5 = output_e["predictions"]
 
-    output_sum = tf.add_n([t1, t2, t3])
+    output_sum = tf.add_n([t1, t2, t3, t4, t5])
 
-    scalar = tf.constant(1/3)
+    scalar = tf.constant(0.20)
     output = tf.scalar_mul(scalar, output_sum)
 
     return {"predictions": output}
@@ -1481,14 +1489,18 @@ class MoeAverageB(models.BaseModel):
     output_a = MoeModel().create_model(model_input, vocab_size, prefix='u2048a/')
     output_b = MoeModel().create_model(model_input, vocab_size, prefix='u2048b/')
     output_c = MoeModel().create_model(model_input, vocab_size, prefix='u2048c/')
+    output_d = MoeModel().create_model(model_input, vocab_size, prefix='u2048d/')
+    output_e = MoeModel().create_model(model_input, vocab_size, prefix='u2048e/')
 
     t1 = output_a["predictions"]
     t2 = output_b["predictions"]
     t3 = output_c["predictions"]
+    t4 = output_d["predictions"]
+    t5 = output_e["predictions"]
 
-    output_sum = tf.add_n([t1, t2, t3])
+    output_sum = tf.add_n([t1, t2, t3, t4, t5])
 
-    scalar = tf.constant(1/3)
+    scalar = tf.constant(0.20)
     output = tf.scalar_mul(scalar, output_sum)
 
     return {"predictions": output}
@@ -1507,13 +1519,15 @@ class StackEnsembleA(models.BaseModel):
     output_2048a = LogisticModel().create_model(model_input, vocab_size)
     output_2048b = MoeModel().create_model(model_input, vocab_size)
     output_2048c = MLPE().create_model(model_input, vocab_size)
+    output_2048d = BiggerNN().create_model(model_input, vocab_size)
 
     t1 = output_2048a["predictions"]
     t2 = output_2048b["predictions"]
     t3 = output_2048c["predictions"]
+    t4 = output_2048d["predictions"]
 
-    output_sum = tf.add_n([t1, t2, t3])
-    scalar = tf.constant(1/3)
+    output_sum = tf.add_n([t1, t2, t3, t4])
+    scalar = tf.constant(0.25)
     avg_output = tf.scalar_mul(scalar, output_sum)
     stacked_fc1 = slim.fully_connected(
       avg_output,
@@ -1545,13 +1559,15 @@ class StackEnsembleB(models.BaseModel):
     output_2048a = LogisticModel().create_model(model_input, vocab_size)
     output_2048b = MoeModel().create_model(model_input, vocab_size)
     output_2048c = MLPE().create_model(model_input, vocab_size)
+    output_2048d = ComplexMoeModel().create_model(model_input, vocab_size)
 
     t1 = output_2048a["predictions"]
     t2 = output_2048b["predictions"]
     t3 = output_2048c["predictions"]
+    t4 = output_2048d["predictions"]
 
-    output_sum = tf.add_n([t1, t2, t3])
-    scalar = tf.constant(1/3)
+    output_sum = tf.add_n([t1, t2, t3, t4])
+    scalar = tf.constant(0.25)
     avg_output = tf.scalar_mul(scalar, output_sum)
 
     output = MLPE().create_model(avg_output, vocab_size)
